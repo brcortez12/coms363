@@ -1,1 +1,1 @@
-# coms363
+# Cortez coms363 activities

@@ -124,6 +124,59 @@ public class hw4 {
 			} catch (SQLException e) {}
 		}
 	}
+	
+	private static void deleteCustomer(Connection conn, int CustomerID) {
+
+		if (conn==null) throw new NullPointerException();
+		JPanel panel = new JPanel(new GridBagLayout());
+		GridBagConstraints cs = new GridBagConstraints();
+		cs.fill = GridBagConstraints.HORIZONTAL;
+		JLabel lbConfirm = new JLabel("Warning all the information related to this customer will be deleted.\n Enter “y” or “n” to proceed: ");
+		cs.gridx = 0;
+		cs.gridy = 0;
+		cs.gridwidth = 1;
+		panel.add(lbConfirm, cs);
+
+		JTextField tfConfirm = new JTextField(20);
+		cs.gridx = 1;
+		cs.gridy = 0;
+		cs.gridwidth = 2;
+		panel.add(tfConfirm, cs);
+
+		String[] options = new String[] { "OK", "Cancel" };
+		int ioption = JOptionPane.showOptionDialog(null, panel, "Delete", JOptionPane.OK_OPTION,
+				JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+		if (ioption == 0) // pressing OK button
+		{
+			if (tfConfirm.getText().contentEquals("Y") || tfConfirm.getText().contentEquals("y")) {
+				if (CustomerID==0) {
+					System.out.println("Please enter a valid customer ID.");
+				}
+				else {
+					try {
+						conn.setAutoCommit(false);
+						conn.setTransactionIsolation(4);
+						PreparedStatement dltstmt = conn.prepareStatement(
+								"delete from customer where customer_id = '"+"?"+"'"); //one parameter is needed
+
+						// first column has the customer id
+						dltstmt.setInt(1, CustomerID);
+
+						int rowcount = dltstmt.executeUpdate();
+
+						System.out.println("Number of rows deleted:" + rowcount);
+						dltstmt.close();
+						// confirm that these are the changes you want to make
+						conn.commit();
+						// if other parts of the program needs commit per SQL statement
+						// conn.setAutoCommit(true);
+					} catch (SQLException e) {
+						System.out.println("Record couldn't be deleted please try again.");
+					}
+				}
+			}
+		}
+	}
 
 
 	public static void main(String[] args) {
@@ -148,14 +201,14 @@ public class hw4 {
 			String sqlQuery = "";
 
 			String option = "";
-			String instruction = "Enter 1: Insert a new actor." + "\n"
-					+ "Enter 2: Delete an actor." + "\n"
-					+ "Enter 3: Find total sales of a month." + "\n"
-					+ "Enter 4: Quit Program";
+			String instruction = "Enter A: Insert a new actor." + "\n"
+					+ "Enter B: Delete a customer." + "\n"
+					+ "Enter C: Find total sales of a month." + "\n"
+					+ "Enter E: Quit Program";
 
 			while (true) {
 				option = JOptionPane.showInputDialog(instruction);
-				if (option.equals("1")) {
+				if (option.equals("A") || option.contentEquals("a")) {
 					String name[] = new String[2];
 					JPanel panel = new JPanel(new GridBagLayout());
 					GridBagConstraints cs = new GridBagConstraints();
@@ -195,29 +248,42 @@ public class hw4 {
 						insertActor(conn, name[0], name[1]);
 					}
 				}
-				/*
-				if (option.equals("1")) {
-					sqlQuery = "select distinct f.fname from food f inner join recipe r on r.fid = f.fid inner join ingredient i on i.iid = r.iid where i.iname = 'Chicken'";
-					runQuery(stmt, sqlQuery);
-				} else if (option.equalsIgnoreCase("2")) {
-					sqlQuery = "select f.fname, count(r.iid), sum(r.amount) from food f inner join recipe r on r.fid = f.fid inner join ingredient i on i.iid = r.iid group by f.fname";
-					runQuery(stmt, sqlQuery);
-				} else if (option.equals("3")) {
-					sqlQuery = "select f.fname from food f where f.fid not in (select r.fid from recipe r inner join ingredient i on i.iid = r.iid where i.iname = 'Green Onion');";
-					runQuery(stmt, sqlQuery);
-				} else if (option.equals("4")) {
-					sqlQuery = "select i.iname, r.amount from food f inner join recipe r on r.fid = f.fid inner join ingredient i on i.iid = r.iid where f.fname = 'Pad Thai'";
-					runQuery(stmt, sqlQuery);
-				} else if (option.equals("5")) {
-					String fname=JOptionPane.showInputDialog("Enter foodname:");
-					insertFood(conn, fname);
-				} else if (option.equals("6")) {
-					String iname=JOptionPane.showInputDialog("Enter exact name of the ingredient to check:");
-					checkIngredient(conn, iname);
-				}  */
-				else if (option.equals("4")){
+				
+				else if (option.equals("B") || option.contentEquals("b")){
+					int customer = 0;
+					JPanel panel = new JPanel(new GridBagLayout());
+					GridBagConstraints cs = new GridBagConstraints();
+					cs.fill = GridBagConstraints.HORIZONTAL;
+					JLabel lbCustomerID = new JLabel("Customer ID: ");
+					cs.gridx = 0;
+					cs.gridy = 0;
+					cs.gridwidth = 1;
+					panel.add(lbCustomerID, cs);
+
+					JTextField tfCustomerID = new JTextField(20);
+					cs.gridx = 1;
+					cs.gridy = 0;
+					cs.gridwidth = 2;
+					panel.add(tfCustomerID, cs);
+
+					String[] options = new String[] { "OK", "Cancel" };
+					int ioption = JOptionPane.showOptionDialog(null, panel, "Delete", JOptionPane.OK_OPTION,
+							JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+					if (ioption == 0) // pressing OK button
+					{
+						customer = Integer.parseInt(tfCustomerID.getText());
+						deleteCustomer(conn, customer);
+					}
+				}
+				
+				else if (option.equals("C") || option.contentEquals("c")){
+					
+				}
+				
+				else if (option.equals("E") || option.contentEquals("e")){
 					break;
 				}
+				
 				else {
 					System.out.println("Please select a valid option.");
 					continue;

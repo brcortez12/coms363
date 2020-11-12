@@ -152,13 +152,6 @@ public class hw4 {
 					+ "Enter 2: Delete an actor." + "\n"
 					+ "Enter 3: Find total sales of a month." + "\n"
 					+ "Enter 4: Quit Program";
-			/*+ "Enter 1: Find all food with chicken as ingredient." + "\n"
-					+ "Enter 2: For each food, list food name, total number of ingredients, and total amount of ingredients (gram)."
-					+ "\n" + "Enter 3: Find all food without green onion as ingredient." + "\n"
-					+ "Enter 4: Find all ingredients and amount of each ingredient of Pad Thai" + "\n"
-					+ "Enter 5: Enter new food" + "\n"
-					+ "Enter 6: Check whether an ingredient exists" + "\n"
-					+ "Enter 7: Quit Program"; */
 
 			while (true) {
 				option = JOptionPane.showInputDialog(instruction);

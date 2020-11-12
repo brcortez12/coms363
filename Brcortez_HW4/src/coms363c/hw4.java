@@ -156,16 +156,27 @@ public class hw4 {
 					try {
 						conn.setAutoCommit(false);
 						conn.setTransactionIsolation(4);
-						PreparedStatement dltstmt = conn.prepareStatement(
-								"delete from customer where customer_id = '"+"?"+"'"); //one parameter is needed
+						PreparedStatement delStmt1 = conn.prepareStatement("DELETE FROM payment WHERE customer_id = ?");
+						PreparedStatement delStmt2 = conn.prepareStatement("DELETE FROM rental WHERE customer_id = ?");
+						PreparedStatement delStmt3 = conn.prepareStatement("DELETE FROM customer WHERE customer_id = ?");
+						
+						delStmt1.setInt(1, CustomerID);
+					    delStmt1.addBatch();
 
-						// first column has the customer id
-						dltstmt.setInt(1, CustomerID);
+					    delStmt2.setInt(1, CustomerID);
+					    delStmt2.addBatch();
 
-						int rowcount = dltstmt.executeUpdate();
+					    delStmt3.setInt(1, CustomerID);
+					    delStmt3.addBatch();
 
-						System.out.println("Number of rows deleted:" + rowcount);
-						dltstmt.close();
+					    delStmt1.executeBatch();
+					    delStmt2.executeBatch();
+					    delStmt3.executeBatch();
+
+						System.out.println("Customer successfully deleted.");
+						delStmt1.close();
+						delStmt2.close();
+						delStmt3.close();
 						// confirm that these are the changes you want to make
 						conn.commit();
 						// if other parts of the program needs commit per SQL statement

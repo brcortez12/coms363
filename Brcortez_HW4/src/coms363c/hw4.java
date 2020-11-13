@@ -124,7 +124,7 @@ public class hw4 {
 			} catch (SQLException e) {}
 		}
 	}
-	
+
 	private static void deleteCustomer(Connection conn, int CustomerID) {
 
 		if (conn==null) throw new NullPointerException();
@@ -159,19 +159,19 @@ public class hw4 {
 						PreparedStatement delStmt1 = conn.prepareStatement("DELETE FROM payment WHERE customer_id = ?");
 						PreparedStatement delStmt2 = conn.prepareStatement("DELETE FROM rental WHERE customer_id = ?");
 						PreparedStatement delStmt3 = conn.prepareStatement("DELETE FROM customer WHERE customer_id = ?");
-						
+
 						delStmt1.setInt(1, CustomerID);
-					    delStmt1.addBatch();
+						delStmt1.addBatch();
 
-					    delStmt2.setInt(1, CustomerID);
-					    delStmt2.addBatch();
+						delStmt2.setInt(1, CustomerID);
+						delStmt2.addBatch();
 
-					    delStmt3.setInt(1, CustomerID);
-					    delStmt3.addBatch();
+						delStmt3.setInt(1, CustomerID);
+						delStmt3.addBatch();
 
-					    delStmt1.executeBatch();
-					    delStmt2.executeBatch();
-					    delStmt3.executeBatch();
+						delStmt1.executeBatch();
+						delStmt2.executeBatch();
+						delStmt3.executeBatch();
 
 						System.out.println("Customer successfully deleted.");
 						delStmt1.close();
@@ -187,6 +187,19 @@ public class hw4 {
 				}
 			}
 		}
+	}
+
+	private static void callStoredTotalSales(Connection conn, int month) {
+		if (conn==null) throw new NullPointerException();
+		try {
+			CallableStatement cstmt= conn.prepareCall("{call my_total_sales(?,?)}");
+			cstmt.setInt(1, month);
+			cstmt.registerOutParameter(2, java.sql.Types.DOUBLE);
+			cstmt.executeUpdate();
+			System.out.println("Total sales = " +cstmt.getDouble(2));
+		}
+		catch (SQLException e) {};
+			System.out.println("Unable to find total sales of the given month.");
 	}
 
 
@@ -259,7 +272,7 @@ public class hw4 {
 						insertActor(conn, name[0], name[1]);
 					}
 				}
-				
+
 				else if (option.equals("B") || option.contentEquals("b")){
 					int customer = 0;
 					JPanel panel = new JPanel(new GridBagLayout());
@@ -286,15 +299,38 @@ public class hw4 {
 						deleteCustomer(conn, customer);
 					}
 				}
-				
+
 				else if (option.equals("C") || option.contentEquals("c")){
-					
+					int month = 0;
+					JPanel panel = new JPanel(new GridBagLayout());
+					GridBagConstraints cs = new GridBagConstraints();
+					cs.fill = GridBagConstraints.HORIZONTAL;
+					JLabel lbMonthNum = new JLabel("Enter the month you would like to find the total sales of as a number (Jan = 1, Feb =2, etc): ");
+					cs.gridx = 0;
+					cs.gridy = 0;
+					cs.gridwidth = 1;
+					panel.add(lbMonthNum, cs);
+
+					JTextField tfMonthNum = new JTextField(20);
+					cs.gridx = 1;
+					cs.gridy = 0;
+					cs.gridwidth = 2;
+					panel.add(tfMonthNum, cs);
+
+					String[] options = new String[] { "OK", "Cancel" };
+					int ioption = JOptionPane.showOptionDialog(null, panel, "Delete", JOptionPane.OK_OPTION,
+							JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+					if (ioption == 0) // pressing OK button
+					{
+						month = Integer.parseInt(tfMonthNum.getText());
+						callStoredTotalSales(conn, month);
+					}
 				}
-				
+
 				else if (option.equals("E") || option.contentEquals("e")){
 					break;
 				}
-				
+
 				else {
 					System.out.println("Please select a valid option.");
 					continue;

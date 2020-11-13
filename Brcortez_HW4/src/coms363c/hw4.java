@@ -192,14 +192,16 @@ public class hw4 {
 	private static void callStoredTotalSales(Connection conn, int month) {
 		if (conn==null) throw new NullPointerException();
 		try {
+			conn.setAutoCommit(false);
+			conn.setTransactionIsolation(4);
 			CallableStatement cstmt= conn.prepareCall("{call my_total_sales(?,?)}");
 			cstmt.setInt(1, month);
 			cstmt.registerOutParameter(2, java.sql.Types.DOUBLE);
 			cstmt.executeUpdate();
 			System.out.println("Total sales = " +cstmt.getDouble(2));
+			conn.commit();
 		}
 		catch (SQLException e) {};
-			System.out.println("Unable to find total sales of the given month.");
 	}
 
 
